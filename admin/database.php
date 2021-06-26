@@ -1,6 +1,6 @@
 <?php
 
-class database{
+class Database{
 
     private static $dbHost = "localhost";
     private static $dbName = "american_restaurant";
@@ -11,7 +11,7 @@ class database{
     public static function connect(){
         try
         {
-            self::$connection = new PDO("mysql:host" . self::$dbHost . ";dbName" . self::$dbName, self::$dbUser, self::$dbUserPassword);
+            self::$connection = new PDO("mysql:host=" . self::$dbHost . ";dbname=" . self::$dbName,self::$dbUser,self::$dbUserPassword);
         }
         catch(PDOException $e)
         {
@@ -24,6 +24,6 @@ class database{
     }
 }
 
-database::connect();
+//Database::connect();
 
 ?>
