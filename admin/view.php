@@ -59,7 +59,7 @@ function checkInput($data)
                         <label>Description:</label><?php echo ' ' . $item['description']; ?>
                     </div>
                     <div class="form-group">
-                        <label>Prix:</label><?php echo ' ' . number_format((float)$item['price'],2, '.', '' ) . '</td>'; ?>
+                        <label>Prix:</label><?php echo ' ' . number_format((float)$item['price'],2, '.', '' ) . ' ' . '€' . '</td>'; ?>
                     </div>
                     <div class="form-group">
                         <label>Catégorie:</label><?php echo ' ' . $item['category']; ?>
@@ -76,7 +76,7 @@ function checkInput($data)
             <div class="col-sm-6 col-md-4 site">
                 <div class="thumbnail">
                     <img src="<?php echo '../images/' . $item['image'] ; ?>" alt="...">
-                    <div class="price"><?php echo number_format((float)$item['price'],2, '.', '' ); ?></div>
+                    <div class="price"><?php echo number_format((float)$item['price'],2, '.', '' ) .' '. '€'; ?></div>
                         <div class="caption">
                                 <h4><?php echo ' ' . $item['name']; ?></h4>
                                 <p><?php echo ' ' . $item['description']; ?></p>
