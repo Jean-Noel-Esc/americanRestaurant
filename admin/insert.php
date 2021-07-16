@@ -1,5 +1,89 @@
 <?php
     require 'database.php';
+    $nameError = $descriptionError = $priceError = $categoryError = $imageError = 
+    $name = $description = $price = $category = $image = "";
+    if(!empty($_POST))
+    {
+        $name            = checkinput($_POST['name']);
+        $description     = checkinput($_POST['description']);
+        $price           = checkinput($_POST['price']);
+        $category        = checkinput($_POST['category']);
+        $image           = checkinput($_FILES['image']['name']);
+        $imagePath       = '../images/' . basename($image);
+        $imageExtension  = pathinfo($imagePath, PATHINFO_EXTENSION);
+        $isSuccess       = true;
+        $isUploadSuccess = false;
+
+        if(empty($name))
+        {
+            $nameError = "Ce champ est obligatoire";
+            $isSuccess = false;
+        }
+        if(empty($description))
+        {
+            $descriptionError = "Ce champ est obligatoire";
+            $isSuccess = false;
+        }
+        if(empty($price))
+        {
+            $priceError = "Ce champ est obligatoire";
+            $isSuccess = false;
+        }
+        if(empty($category))
+        {
+            $categoryError = "Ce champ est obligatoire";
+            $isSuccess = false;
+        }
+        if(empty($image))
+        {
+            $imageError = "Ce champ est obligatoire";
+            $isSuccess = false;
+        } 
+            else 
+            {
+                $isUploadSuccess = true;
+                if($imageExtension != "jpg" && $imageExtension != "png" && $imageExtension != "jpeg" && $imageExtension != "gif")
+                {
+                    $imageError = "Les fichiers autorisés sont : .jpg, .jpeg, .png, .gif";
+                    $isUploadSuccess = false;
+                }
+                if(file_exists($imagePath))
+                {
+                    $imageError = "le fichier existe déja";
+                    $isUploadSuccess = false;
+                }
+                if($_FILES["image"]["size"] > 500000)
+                {
+                    $imageError = "Le fichier ne doit pas dépasser 500 KB";
+                    $isUploadSuccess = false;
+                }
+                if($isUploadSuccess)
+                {
+                    if(!move_uploaded_file($_FILES["image"]['tmp_name'], $imagePath))
+                    {
+                        $imageError = "Il y a eu une erreur lors de l'upload";
+                        $isUploadSuccess = false;
+                    }
+                }
+            }
+
+            if($isSuccess && $isUploadSuccess)
+            {
+                $db = Database::connect();
+                $statement = $db->prepare("INSERT INTO items (name,description,price,category,image) values(?,?,?,?,?)");
+                $statement ->execute(array($name,$description,$price,$category,$image));
+                Database::disconnect();
+                header("location: index.php");
+            }
+    }
+
+    function checkInput($data)
+    {
+    $data = trim($data);
+    $data = stripslashes($data);
+    $data = htmlspecialchars($data);
+    return $data;
+    }
 ?>
 
 <!DOCTYPE html>
@@ -15,7 +99,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <!-- <link href="https://fonts.googleapis.com/css2?family=EB+Garamond&display=swap" rel="stylesheet"> -->
-
     <link rel="stylesheet" href="../css/style.css">
 </head>
 
@@ -50,7 +133,7 @@
                             {
                                 echo '<option value="' . $row['id'] . '">' . $row['name'] . '</option>'; 
                             }
-                            $Database::disconnect();
+                            Database::disconnect();
                         ?>
                     </select>
                     <span class="help-inline"><?php echo $categoryError; ?></span>
@@ -60,12 +143,12 @@
                     <input type="file" id="image" name="image">
                     <span class="help-inline"><?php echo $imageError; ?></span>
                 </div>
+                <br>
+                <div class="form action">
+                    <button type="submit" class="btn btn-success"><span class="glyphicon glyphicon-pencil"></span>Ajouter</button>
+                    <a class="btn btn-primary" href="index.php"><span class="glyphicon glyphicon-arrow-left"></span> Retour</a>
+                </div>
             </form>
-            <br>
-            <div class="form action">
-                <button type="submit" class="btn btn-success"><span class="glyphicon glyphicon-pencil"></span>Ajouter</a>
-                <a class="btn btn-primary" href="index.php"><span class="glyphicon glyphicon-arrow-left"></span> Retour</a>
-            </div>
         </div>
     </div>
 
