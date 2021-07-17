@@ -67,14 +67,14 @@
                 }
             }
 
-            if($isSuccess && $isUploadSuccess)
-            {
-                $db = Database::connect();
-                $statement = $db->prepare("INSERT INTO items (name,description,price,category,image) values(?,?,?,?,?)");
-                $statement ->execute(array($name,$description,$price,$category,$image));
-                Database::disconnect();
-                header("location: index.php");
-            }
+        if($isSuccess && $isUploadSuccess)
+        {
+            $db = Database::connect();
+            $statement = $db->prepare("INSERT INTO items (name,description,price,category,image) values(?,?,?,?,?)");
+            $statement ->execute(array($name,$description,$price,$category,$image));
+            Database::disconnect();
+            header("location: index.php");
+        }
     }
 
     function checkInput($data)
