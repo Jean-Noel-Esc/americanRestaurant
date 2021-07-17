@@ -38,7 +38,7 @@
                     <?php
                     require "database.php";
                     $db = Database::connect();
-                    $statement = $db->query('SELECT items.id, items.name, items.price, categories.name AS category
+                    $statement = $db->query('SELECT items.id, items.name, items.description, items.price, categories.name AS category
                                             FROM items LEFT JOIN categories ON items.category = categories.id
                                             ORDER BY items.id DESC');
                     while($item = $statement->fetch())

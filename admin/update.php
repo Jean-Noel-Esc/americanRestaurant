@@ -1,7 +1,14 @@
 <?php
     require 'database.php';
+    
+    if(!empty($_GET['id']))
+    {
+        $id = checkinput($_GET['id']);
+    }
+
     $nameError = $descriptionError = $priceError = $categoryError = $imageError = 
     $name = $description = $price = $category = $image = "";
+    
     if(!empty($_POST))
     {
         $name            = checkinput($_POST['name']);
@@ -12,7 +19,7 @@
         $imagePath       = '../images/' . basename($image);
         $imageExtension  = pathinfo($imagePath, PATHINFO_EXTENSION);
         $isSuccess       = true;
-        $isUploadSuccess = false;
+        // $isUploadSuccess = false;
 
         if(empty($name))
         {
@@ -36,11 +43,11 @@
         }
         if(empty($image))
         {
-            $imageError = "Ce champ est obligatoire";
-            $isSuccess = false;
+            $isImageUpdated = false;            
         } 
             else 
             {
+                $isImageUpdated = true;
                 $isUploadSuccess = true;
                 if($imageExtension != "jpg" && $imageExtension != "png" && $imageExtension != "jpeg" && $imageExtension != "gif")
                 {
@@ -67,14 +74,48 @@
                 }
             }
 
-        if($isSuccess && $isUploadSuccess)
+        if(($isSuccess && $isImageUpdated && $isUploadSuccess) || ($isSuccess && !$isImageUpdated) ) 
         {
             $db = Database::connect();
-            $statement = $db->prepare("INSERT INTO items (name,description,price,category,image) values(?,?,?,?,?)");
-            $statement ->execute(array($name,$description,$price,$category,$image));
+            if ($isImageUpdated)
+            {
+                $statement = $db->prepare("UPDATE items set name = ?, description = ?, price = ?, category = ?, image = ? WHERE id = ?");
+                $statement ->execute(array($name,$description,$price,$category,$image,$id));    
+            }
+            else
+            {
+                $statement = $db->prepare("UPDATE items set name = ?, description = ?, price = ?, category = ? WHERE id = ?");
+                $statement ->execute(array($name,$description,$price,$category,$id));    
+            }
+
             Database::disconnect();
             header("location: index.php");
         }
+        else if($isImageUpdated && !$isUploadSuccess)
+        {
+            $db = Database::connect();
+            $statement = $db->prepare("SELECT image FROM items WHERE id = ?");
+            $statement->execute(array($id));
+            $item = $statement->fetch();
+            $image = $item['image'];
+            Database::disconnect();
+
+        }
+
+    }
+    else
+    {
+        $db = Database::connect();
+        $statement = $db->prepare("SELECT * FROM items WHERE id = ?");
+        $statement->execute(array($id));
+        $item = $statement->fetch();
+        $name            = $item['name'];
+        $description     = $item['description'];
+        $price           = $item['price'];
+        $category        = $item['category'];
+        $image           = $item['image'];
+        Database::disconnect();
+        // header("location: index.php");   
     }
 
     function checkInput($data)
@@ -132,7 +173,7 @@
                                 $db = Database::connect();
                                 foreach($db->query('SELECT * FROM categories') as $row)
                                 {   
-                                    if($row['id' == $category])
+                                    if($row['id'] == $category)
                                         echo '<option selected="selected" value="' . $row['id'] . '">' . $row['name'] . '</option>';
                                     else
                                         echo '<option value="' . $row['id'] . '">' . $row['name'] . '</option>'; 
@@ -151,11 +192,22 @@
                     </div>
                     <br>
                     <div class="form action">
-                        <button type="submit" class="btn btn-success"><span class="glyphicon glyphicon-pencil"></span>Ajouter</button>
+                        <button type="submit" class="btn btn-success"><span class="glyphicon glyphicon-pencil"></span>Modifier</button>
                         <a class="btn btn-primary" href="index.php"><span class="glyphicon glyphicon-arrow-left"></span> Retour</a>
                     </div>
                 </form>
-            </div>   
+            </div> 
+            <div class="col-sm-6 site">
+                <div class="thumbnail">
+                        <img src="<?php echo '../images/' . $image ; ?>" alt="...">
+                        <div class="price"><?php echo number_format((float)$price,2, '.', '' ) .' '. '€'; ?></div>
+                            <div class="caption">
+                                    <h4><?php echo $name; ?></h4>
+                                    <p><?php echo $description; ?></p>
+                                    <a href="#" class="btn btn-order" role="button">Commander</a>
+                            </div>
+                    </div>
+            </div>  
         </div>
     </div>
 
