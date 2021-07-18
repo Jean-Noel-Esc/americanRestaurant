@@ -60,7 +60,7 @@
                     }
                     Database::disconnect();
                     ?>
-                    <tr>
+                    <!-- <tr>
                         <td>item</td>
                         <td>des</td>
                         <td></td>
@@ -70,7 +70,7 @@
                             <a class="btn btn-primary" href="update.php?id=1"><span class="glyphicon glyphicon-pencil"></span>Modifier</a>
                             <a class="btn btn-danger" href="delete.php?id=1"><span class="glyphicon glyphicon-remove"></span>Supprimer</a>
                         </td>
-                    </tr>
+                    </tr> -->
                 </tbody>
 
             </table>
